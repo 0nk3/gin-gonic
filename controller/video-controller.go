@@ -9,7 +9,7 @@ import (
 // VideoController . .
 type VideoController interface {
 	ListAll() []entity.Video
-	Save(c *gin.Context) entity.Video
+	Save(c *gin.Context) error
 }
 
 type controller struct {
@@ -26,9 +26,12 @@ func New(service service.VideoService) VideoController {
 func (c *controller) ListAll() []entity.Video {
 	return c.service.ListAll()
 }
-func (c *controller) Save(ctx *gin.Context) entity.Video {
+func (c *controller) Save(ctx *gin.Context) error {
 	var video entity.Video
-	ctx.BindJSON(&video)
+	err := ctx.ShouldBindJSON(&video)
+	if err != nil {
+		return err
+	}
 	c.service.Save(video)
-	return video
+	return nil
 }
